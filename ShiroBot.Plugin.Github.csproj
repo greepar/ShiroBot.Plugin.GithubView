@@ -10,7 +10,6 @@
         <HostPluginDir>..\ShiroBot\bin\Debug\$(TargetFramework)\plugins\$(AssemblyName)\</HostPluginDir>
         <!-- 启用 AXAML 编译：把 .axaml 编译进程序集，运行时由 AvaloniaXamlLoader.Load(this) 还原。 -->
         <AvaloniaUseCompiledBindingsByDefault>true</AvaloniaUseCompiledBindingsByDefault>
-        <RootNamespace>ShiroBot.AvaloniaDemoPlugin</RootNamespace>
     </PropertyGroup>
 
     <ItemGroup>
@@ -42,9 +41,7 @@
             <ExcludeAssets>runtime</ExcludeAssets>
             <PrivateAssets>none</PrivateAssets>
         </PackageReference>
-        <PackageReference Include="HotAvalonia" Version="3.1.1" PrivateAssets="All" Publish="True"
-                          Condition="'$(Configuration)'=='Debug' or '$(Configuration)'=='DebugPlugin' or '$(Configuration)'=='DebugAdapter' or '$(Configuration)'=='DebugAll'" />
-    </ItemGroup>
+ </ItemGroup>
 
     <!--
         拷贝到宿主 plugins/ 目录的 target。不挂 AfterTargets，避免 slnx 全量构建时无条件触发；

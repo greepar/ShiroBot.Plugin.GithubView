@@ -34,11 +34,7 @@ public sealed class DescriptionCardViewModel
     public Color Language3Color { get; init; } = Color.Parse("#89E051");
     public Color Language4Color { get; init; } = Colors.Transparent;
     public Color Language5Color { get; init; } = Colors.Transparent;
-
-    public string RequestedBy { get; init; } = "Designer";
-    public string Timestamp { get; init; } = "2026-06-10 12:00:00";
-    public string Footer { get; init; } = "AvaloniaDemoPlugin designer preview";
-
+    
     public string OwnerDisplay => Owner + "/";
     public string OwnerInitial => string.IsNullOrWhiteSpace(Owner) ? "?" : Owner[..1].ToUpperInvariant();
     public Bitmap? Avatar => AvatarBytes is null ? null : new Bitmap(new MemoryStream(AvatarBytes));

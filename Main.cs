@@ -1,4 +1,4 @@
-using ShiroBot.AvaloniaDemoPlugin.ViewModels;
+using ShiroBot.AvaloniaDemoPlugin.Service;
 using ShiroBot.AvaloniaDemoPlugin.Views;
 using ShiroBot.AvaloniaSdk;
 using ShiroBot.Model.Common;
@@ -6,7 +6,7 @@ using ShiroBot.SDK.Abstractions;
 using ShiroBot.SDK.Core;
 using ShiroBot.SDK.Plugin;
 
-namespace ShiroBot.AvaloniaDemoPlugin;
+namespace ShiroBot.Plugin.Github;
 
 /// <summary>
 /// 演示如何用独立 .axaml + UserControl 渲染图片。
@@ -16,7 +16,7 @@ namespace ShiroBot.AvaloniaDemoPlugin;
 /// - #render：好友/群聊里发起一次截图
 /// - #gh https://github.com/owner/repo：渲染指定 GitHub 仓库卡片
 /// </summary>
-public sealed class AvaloniaDemoPlugin : PluginBase
+public sealed class Main : PluginBase
 {
     private readonly GitHubRepositoryClient _github = new();
 
@@ -32,52 +32,39 @@ public sealed class AvaloniaDemoPlugin : PluginBase
 
     protected override Task LoadAsync()
     {
-        FriendCommands.MapWhen(message => TryReadGitHubRepository(message.GetPlainText(), out _, out _), HandleFriendGitHubRenderAsync);
         GroupCommands.MapWhen(message => TryReadGitHubRepository(message.GetPlainText(), out _, out _), HandleGroupGitHubRenderAsync);
-
-        BotLog.Info("[AvaloniaDemoPlugin] 已加载，使用 #render、#gh <GitHub URL> 或直接发送 GitHub 仓库链接触发截图。");
+        BotLog.Info("Github 插件已加载，发送 GitHub 仓库链接触发截图。");
         return Task.CompletedTask;
-    }
-    
-
-    private async Task HandleFriendGitHubRenderAsync(FriendIncomingMessage message)
-    {
-        if (!TryReadGitHubRepository(message.GetPlainText(), out var owner, out var repository))
-        {
-            await Context.Message.ReplyAsync(message, "用法：#gh https://github.com/owner/repo");
-            return;
-        }
-
-        var segment = await RenderAsync(message.SenderId.ToString(), owner, repository).ConfigureAwait(false);
-        if (segment is null)
-        {
-            await Context.Message.ReplyAsync(message, "宿主未启用 Avalonia 渲染（EnableAvalonia=false），无法渲染图片。");
-            return;
-        }
-
-        await Context.Message.ReplyAsync(message, segment);
     }
 
     private async Task HandleGroupGitHubRenderAsync(GroupIncomingMessage message)
     {
+        BotLog.Info($"检测到 GitHub 链接，尝试解析: {message.GetPlainText()}");
         if (!TryReadGitHubRepository(message.GetPlainText(), out var owner, out var repository))
         {
-            await Context.Message.ReplyAsync(message, "用法：#gh https://github.com/owner/repo");
+            BotLog.Error("Github链接解析失败，无法提取 repository。");
             return;
         }
 
-        var segment = await RenderAsync(message.SenderId.ToString(), owner, repository).ConfigureAwait(false);
-        if (segment is null)
+        try
         {
-            await Context.Message.ReplyAsync(message, "宿主未启用 Avalonia 渲染（EnableAvalonia=false），无法渲染图片。");
-            return;
-        }
+            var segment = await RenderAsync(owner, repository).ConfigureAwait(false);
+            if (segment is null)
+            {
+                await Context.Message.ReplyAsync(message, "宿主未启用 Avalonia 渲染（EnableAvalonia=false），无法渲染图片。");
+                return;
+            }
 
-        await Context.Message.ReplyAsync(message, segment);
+            await Context.Message.ReplyAsync(message, segment);
+        }
+        catch (Exception ex)
+        {
+            await Context.Message.ReplyAsync(message, $"渲染 GitHub 仓库卡片失败: {ex.Message}");
+            BotLog.Warning($"获取 GitHub 数据失败， {ex.Message}");
+        }
     }
 
     private async Task<ImageOutgoingSegment?> RenderAsync(
-        string requestedBy,
         string owner = "ShirokaProject",
         string repository = "ShiroBot")
     {
@@ -87,39 +74,15 @@ public sealed class AvaloniaDemoPlugin : PluginBase
         }
 
         var avalonia = Context.Render.AsAvalonia();
-        var vm = await CreateViewModelAsync(requestedBy, owner, repository).ConfigureAwait(false);
-
+        var vm = await _github.GetRepositoryCardAsync(
+            owner,
+            repository).ConfigureAwait(false);
         var png = await avalonia.RenderControlPngAsync(
             () => new DescriptionCard { DataContext = vm }).ConfigureAwait(false);
 
         return new ImageOutgoingSegment("base64://" + Convert.ToBase64String(png));
     }
-
-    private async Task<DescriptionCardViewModel> CreateViewModelAsync(string requestedBy, string owner, string repository)
-    {
-        try
-        {
-            return await _github.GetRepositoryCardAsync(
-                owner,
-                repository,
-                requestedBy,
-                $"AvaloniaDemoPlugin v{Metadata.Version}").ConfigureAwait(false);
-        }
-        catch (Exception ex)
-        {
-            BotLog.Warning($"[AvaloniaDemoPlugin] 获取 GitHub 数据失败，使用示例数据: {ex.Message}");
-            return new DescriptionCardViewModel
-            {
-                Owner = owner,
-                Repository = repository,
-                Description = "GitHub API request failed. Showing fallback card data.",
-                RequestedBy = requestedBy,
-                Timestamp = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"),
-                Footer = $"AvaloniaDemoPlugin v{Metadata.Version} · GitHub API fallback"
-            };
-        }
-    }
-
+    
     private static bool TryReadGitHubRepository(string text, out string owner, out string repository)
     {
         owner = string.Empty;

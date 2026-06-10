@@ -5,7 +5,7 @@ using Avalonia.Controls;
 using Avalonia.Media;
 using ShiroBot.AvaloniaDemoPlugin.ViewModels;
 
-namespace ShiroBot.AvaloniaDemoPlugin;
+namespace ShiroBot.AvaloniaDemoPlugin.Service;
 
 internal sealed class GitHubRepositoryClient
 {
@@ -15,8 +15,6 @@ internal sealed class GitHubRepositoryClient
     public async Task<DescriptionCardViewModel> GetRepositoryCardAsync(
         string owner,
         string repository,
-        string requestedBy,
-        string footer,
         CancellationToken ct = default)
     {
         using var response = await Http.GetAsync($"repos/{owner}/{repository}", ct).ConfigureAwait(false);
@@ -55,9 +53,6 @@ internal sealed class GitHubRepositoryClient
             Language3Color = languages[2].Color,
             Language4Color = languages[3].Color,
             Language5Color = languages[4].Color,
-            RequestedBy = requestedBy,
-            Timestamp = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss", CultureInfo.InvariantCulture),
-            Footer = footer
         };
     }
 
@@ -89,7 +84,7 @@ internal sealed class GitHubRepositoryClient
         var languages = document.RootElement.EnumerateObject()
             .Select(property => new
             {
-                Name = property.Name,
+                property.Name,
                 Bytes = property.Value.TryGetInt64(out var value) ? value : 0
             })
             .Where(language => language.Bytes > 0)
