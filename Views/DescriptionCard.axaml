@@ -54,15 +54,8 @@
                     Height="140" 
                     CornerRadius="16" 
                     VerticalAlignment="Center"
+                    Background="Transparent"
                     ClipToBounds="True">
-                <Border.Background>
-                    <!-- 用深色星空渐变模拟一下你图里的背景 -->
-                    <LinearGradientBrush StartPoint="0%,0%" EndPoint="100%,100%">
-                        <GradientStop Color="#161b22" Offset="0"/>
-                        <GradientStop Color="#30244d" Offset="0.5"/>
-                        <GradientStop Color="#1e2d40" Offset="1"/>
-                    </LinearGradientBrush>
-                </Border.Background>
                 <Grid>
                     <Image Source="{Binding Avatar}"
                            IsVisible="{Binding HasAvatar}"

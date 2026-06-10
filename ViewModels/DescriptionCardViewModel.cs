@@ -45,7 +45,7 @@ public sealed class DescriptionCardViewModel
     {
         try
         {
-            using var stream = AssetLoader.Open(new Uri("avares://ShiroBot.Plugin.Github/Assets/shiroka-project-avatar.png"));
+            using var stream = AssetLoader.Open(new Uri("avares://ShiroBot.Plugin.Github/Assets/shiroka-project-avatar.jpg"));
             using var ms = new MemoryStream();
             stream.CopyTo(ms);
             return ms.ToArray();

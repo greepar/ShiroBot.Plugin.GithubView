@@ -8,14 +8,6 @@ using ShiroBot.SDK.Plugin;
 
 namespace ShiroBot.Plugin.Github;
 
-/// <summary>
-/// 演示如何用独立 .axaml + UserControl 渲染图片。
-/// 适合需要 IDE 智能提示、AXAML 调试预览、复杂控件树场景。
-///
-/// 命令：
-/// - #render：好友/群聊里发起一次截图
-/// - #gh https://github.com/owner/repo：渲染指定 GitHub 仓库卡片
-/// </summary>
 public sealed class Main : PluginBase
 {
     private readonly GitHubRepositoryClient _github = new();
@@ -51,7 +43,7 @@ public sealed class Main : PluginBase
             var segment = await RenderAsync(owner, repository).ConfigureAwait(false);
             if (segment is null)
             {
-                await Context.Message.ReplyAsync(message, "宿主未启用 Avalonia 渲染（EnableAvalonia=false），无法渲染图片。");
+                await Context.Message.QuoteReplyAsync(message, "宿主未启用 Avalonia 渲染（EnableAvalonia=false），无法渲染图片。");
                 return;
             }
 
@@ -59,7 +51,7 @@ public sealed class Main : PluginBase
         }
         catch (Exception ex)
         {
-            await Context.Message.ReplyAsync(message, $"渲染 GitHub 仓库卡片失败: {ex.Message}");
+            await Context.Message.QuoteReplyAsync(message, $"渲染 GitHub 仓库卡片失败: {ex.Message}");
             BotLog.Warning($"获取 GitHub 数据失败， {ex.Message}");
         }
     }
