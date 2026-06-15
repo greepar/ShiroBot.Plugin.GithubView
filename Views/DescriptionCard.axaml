@@ -1,15 +1,15 @@
 <UserControl xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:vm="clr-namespace:ShiroBot.AvaloniaDemoPlugin.ViewModels"
-             x:Class="ShiroBot.AvaloniaDemoPlugin.Views.DescriptionCard"
-             x:DataType="vm:DescriptionCardViewModel"
-             MinWidth="700" MinHeight="350">
+             xmlns:views="clr-namespace:ShiroBot.Plugin.GithubView.Views"
+             x:Class="ShiroBot.Plugin.Github.Views.DescriptionCard"
+             x:DataType="views:DescriptionCardViewModel"
+             Width="700" MinHeight="350">
     
     <Design.DataContext>
-        <vm:DescriptionCardViewModel/>
+        <views:DescriptionCardViewModel/>
     </Design.DataContext>
     
-    <Border 
+   <Border 
         Background="#FFFFFF" 
         CornerRadius="10" 
         BorderBrush="#D0D7DE" 
@@ -17,28 +17,29 @@
         ClipToBounds="True">
     <Grid RowDefinitions="*, Auto, Auto, 6">
         <Grid Grid.Row="0" ColumnDefinitions="*, Auto" Margin="32,32,32,24">
-            <StackPanel Grid.Column="0" VerticalAlignment="Center" Margin="0,0,24,0">
-                <TextBlock Text="{Binding OwnerDisplay}" 
-                           Margin="0,0,0,16"
+            <Grid Grid.Column="0" RowDefinitions="Auto,Auto,Auto" 
+                        VerticalAlignment="Center" Margin="0,0,24,0">
+                <TextBlock Grid.Row="0" Text="{Binding OwnerDisplay}" 
+                           Margin="0,0,0,0"
                            FontSize="24" 
                            Foreground="#57606A" 
                            FontWeight="Light"
-                           TextTrimming="None"
+                           TextWrapping="Wrap"
+                           TextTrimming="CharacterEllipsis"
                            MaxLines="1"/>
                 
-                <TextBlock Text="{Binding Repository}" 
+                <TextBlock Grid.Row="1"  Text="{Binding Repository}" 
                            FontSize="48" 
                            Foreground="#24292F" 
                            FontWeight="Bold" 
-                           Margin="0,-8,0,16"
+                           Margin="0,0,0,0"
                            TextWrapping="Wrap"
                            TextTrimming="CharacterEllipsis"
                            HorizontalAlignment="Left"
                            Width="450"
-                           MaxLines="2"
-                           LineHeight="52"/>
+                           MaxLines="2"/>
                  
-                <TextBlock Text="{Binding Description}" 
+                <TextBlock Grid.Row="2"  Text="{Binding Description}" 
                            HorizontalAlignment="Left"
                            Width="430"
                            FontSize="18" 
@@ -47,7 +48,7 @@
                            TextTrimming="CharacterEllipsis"
                            MaxLines="4"
                            LineHeight="26"/>
-            </StackPanel>
+            </Grid>
             
             <Border Grid.Column="1" 
                     Width="140" 
@@ -133,11 +134,11 @@
             <Border Grid.Column="0"
                         HorizontalAlignment="Left"
                         VerticalAlignment="Center"
-                        Margin="8,0,5,15"
+                        Margin="8,0,4,14"
                         >
                 <Grid ColumnDefinitions="Auto,*" VerticalAlignment="Center">
                     <Ellipse Grid.Column="0" Width="10" Height="10"
-                             Margin="0 0 6 0"
+                             Margin="0 0 5 0"
                              VerticalAlignment="Center">
                         <Ellipse.Fill>
                             <SolidColorBrush Color="{Binding Language1Color}"/>
@@ -145,6 +146,7 @@
                     </Ellipse>
                 
                     <TextBlock Grid.Column="1" 
+                               Margin="0 0 0 1"
                                Foreground="#57606A" 
                                Text="{Binding PrimaryLanguage}"
                                VerticalAlignment="Center"/>

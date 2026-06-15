@@ -1,7 +1,7 @@
 using Avalonia.Controls;
 using Avalonia.Markup.Xaml;
 
-namespace ShiroBot.AvaloniaDemoPlugin.Views;
+namespace ShiroBot.Plugin.Github.Views;
 
 public partial class DescriptionCard : UserControl
 {

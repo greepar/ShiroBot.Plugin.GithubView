@@ -5,23 +5,16 @@
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
         <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
+        <RequiresAvaloniaHost>true</RequiresAvaloniaHost>
         <Configurations>Debug;DebugPlugin;DebugAdapter;DebugAll;Release</Configurations>
         <HostPluginDir>..\ShiroBot\bin\Debug\$(TargetFramework)\plugins\$(AssemblyName)\</HostPluginDir>
     </PropertyGroup>
-
-    <ItemGroup>
-        <ProjectReference Include="..\ShiroBot.SDK\ShiroBot.SDK.csproj"/>
-        <!--
-            AvaloniaSdk 由宿主注册到 SharedAssemblyResolver。引用它能拿到 IAvaloniaRenderContext，
-            运行时类型从宿主 Default ALC 转发，避免重复加载。
-        -->
-        <ProjectReference Include="..\ShiroBot.AvaloniaSdk\ShiroBot.AvaloniaSdk.csproj" />
-    </ItemGroup>
+    
 
     <!-- 让 partial class 在 IDE 中折叠到 .axaml 之下，仅影响 Solution Explorer 显示 -->
     <ItemGroup>
         <Compile Update="Views\DescriptionCard.axaml.cs">
-            <DependentUpon>ScreenshotView.axaml</DependentUpon>
+            <DependentUpon>DescriptionCard.axaml</DependentUpon>
         </Compile>
     </ItemGroup>
 
@@ -34,10 +27,13 @@
     </ItemGroup>
 
     <ItemGroup>
-        <PackageReference Include="Avalonia" Version="12.0.3">
+        <PackageReference Include="Avalonia" Version="12.0.4">
             <ExcludeAssets>runtime</ExcludeAssets>
             <PrivateAssets>none</PrivateAssets>
+            <IncludeAssets>compile; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         </PackageReference>
+        <PackageReference Include="ShiroBot.AvaloniaSdk" Version="0.2.0" />
+        <PackageReference Include="ShiroBot.SDK" Version="0.3.0" />
  </ItemGroup>
 
     <!--
@@ -46,7 +42,7 @@
         这样 EnableAvalonia=false 时此插件虽然仍被 slnx 编译（保证 IDE 可调试 .axaml），但不会出现在宿主输出。
     -->
     <Target Name="CopyPluginToHost"
-            Condition="'$(Configuration)'=='Debug' or '$(Configuration)'=='DebugPlugin' or '$(Configuration)'=='DebugAll'">
+            Condition="('$(Configuration)'=='Debug' or '$(Configuration)'=='DebugPlugin' or '$(Configuration)'=='DebugAll') and ('$(RequiresAvaloniaHost)'!='true' or '$(EnableAvalonia)'=='true')">
         <MakeDir Directories="$(HostPluginDir)" />
 
         <ItemGroup>

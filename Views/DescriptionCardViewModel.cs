@@ -3,7 +3,7 @@ using Avalonia.Media;
 using Avalonia.Media.Imaging;
 using Avalonia.Platform;
 
-namespace ShiroBot.AvaloniaDemoPlugin.ViewModels;
+namespace ShiroBot.Plugin.GithubView.Views;
 
 /// <summary>
 /// GitHub 仓库卡片 ViewModel：纯 POCO，AXAML 通过 compiled binding 读取属性。
@@ -14,7 +14,7 @@ public sealed class DescriptionCardViewModel
     public string Owner { get; init; } = "ShirokaProject";
     public string Repository { get; init; } = "ShiroBot";
     public string Description { get; init; } =
-        "C# 实现的插件化机器人框架。";
+        "C# 实现的插件化机器人框架，支持多平台运行，提供丰富的 SDK 和示例，助力开发者轻松构建功能强大的机器人应用。";
 
     public string Contributors { get; init; } = "1";
     public string Issues { get; init; } = "0";
@@ -45,7 +45,7 @@ public sealed class DescriptionCardViewModel
     {
         try
         {
-            using var stream = AssetLoader.Open(new Uri("avares://ShiroBot.Plugin.Github/Assets/shiroka-project-avatar.jpg"));
+            using var stream = AssetLoader.Open(new Uri("avares://ShiroBot.Plugin.GithubView/Assets/shiroka-project-avatar.jpg"));
             using var ms = new MemoryStream();
             stream.CopyTo(ms);
             return ms.ToArray();

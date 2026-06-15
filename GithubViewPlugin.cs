@@ -1,26 +1,25 @@
-using ShiroBot.AvaloniaDemoPlugin.Service;
-using ShiroBot.AvaloniaDemoPlugin.Views;
 using ShiroBot.AvaloniaSdk;
 using ShiroBot.Model.Common;
+using ShiroBot.Plugin.Github.Views;
+using ShiroBot.Plugin.GithubView.Service;
 using ShiroBot.SDK.Abstractions;
 using ShiroBot.SDK.Core;
 using ShiroBot.SDK.Plugin;
 
-namespace ShiroBot.Plugin.Github;
+namespace ShiroBot.Plugin.GithubView;
 
-public sealed class Main : PluginBase
+[BotPlugin(id: "GithubView",
+    Name = "Github 预览插件",
+    Version = "1.0.0",
+    Description = "解析 GitHub 仓库链接并渲染相关信息卡片。",
+    GithubRepo = "greepar/ShiroBot.Plugin.GithubView",
+    IsPluginSingleFile = true)
+]
+public sealed class GithubViewPlugin : PluginBase
 {
     private readonly GitHubRepositoryClient _github = new();
 
     public override string Name => "GithubPlugin";
-
-    public override BotComponentMetadata Metadata { get; } = new()
-    {
-        Name = "Github 解析插件",
-        Version = "1.0.0",
-        Description = "解析Github地址",
-        IsPluginSingleFile = true
-    };
 
     protected override Task LoadAsync()
     {
@@ -47,6 +46,7 @@ public sealed class Main : PluginBase
                 return;
             }
 
+            BotLog.Success("Github页面渲染完成。");
             await Context.Message.ReplyAsync(message, segment);
         }
         catch (Exception ex)
@@ -64,13 +64,13 @@ public sealed class Main : PluginBase
         {
             return null;
         }
-
-        var avalonia = Context.Render.AsAvalonia();
+        
         var vm = await _github.GetRepositoryCardAsync(
             owner,
             repository).ConfigureAwait(false);
-        var png = await avalonia.RenderControlPngAsync(
-            () => new DescriptionCard { DataContext = vm }).ConfigureAwait(false);
+        var png = await Context.RenderControlPngAsync<DescriptionCard>(
+            vm, 
+            new ControlRenderOptions(RenderTheme.Auto));
 
         return new ImageOutgoingSegment("base64://" + Convert.ToBase64String(png));
     }

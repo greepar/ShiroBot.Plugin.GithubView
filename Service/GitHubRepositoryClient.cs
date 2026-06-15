@@ -3,9 +3,10 @@ using System.Net.Http.Headers;
 using System.Text.Json;
 using Avalonia.Controls;
 using Avalonia.Media;
-using ShiroBot.AvaloniaDemoPlugin.ViewModels;
+using ShiroBot.Plugin.Github.Views;
+using ShiroBot.Plugin.GithubView.Views;
 
-namespace ShiroBot.AvaloniaDemoPlugin.Service;
+namespace ShiroBot.Plugin.GithubView.Service;
 
 internal sealed class GitHubRepositoryClient
 {
