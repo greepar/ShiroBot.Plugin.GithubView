@@ -32,8 +32,8 @@
             <PrivateAssets>none</PrivateAssets>
             <IncludeAssets>compile; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         </PackageReference>
-        <PackageReference Include="ShiroBot.AvaloniaSdk" Version="0.2.0" />
-        <PackageReference Include="ShiroBot.SDK" Version="0.3.0" />
+        <PackageReference Include="ShiroBot.AvaloniaSdk" Version="0.5.0" />
+        <PackageReference Include="ShiroBot.SDK" Version="0.5.0" />
  </ItemGroup>
 
     <!--
@@ -54,5 +54,5 @@
               DestinationFiles="@(PluginDebugOutput->'$(HostPluginDir)%(RecursiveDir)%(Filename)%(Extension)')"
               SkipUnchangedFiles="true" />
     </Target>
-
+    
 </Project>
