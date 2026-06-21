@@ -2,29 +2,12 @@
 
     <PropertyGroup>
         <TargetFramework>net10.0</TargetFramework>
-        <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
+        <ImplicitUsings>enable</ImplicitUsings>
         <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
-        <RequiresAvaloniaHost>true</RequiresAvaloniaHost>
-        <Configurations>Debug;DebugPlugin;DebugAdapter;DebugAll;Release</Configurations>
-        <HostPluginDir>..\ShiroBot\bin\Debug\$(TargetFramework)\plugins\$(AssemblyName)\</HostPluginDir>
+        <!--        在此处配置你的宿主插件目录-->
+        <HostPluginDir>ShiroBot\plugins\$(AssemblyName)\</HostPluginDir>
     </PropertyGroup>
-    
-
-    <!-- 让 partial class 在 IDE 中折叠到 .axaml 之下，仅影响 Solution Explorer 显示 -->
-    <ItemGroup>
-        <Compile Update="Views\DescriptionCard.axaml.cs">
-            <DependentUpon>DescriptionCard.axaml</DependentUpon>
-        </Compile>
-    </ItemGroup>
-
-    <!--
-        Avalonia 包用于编译期：拿到 UserControl / AvaloniaXamlLoader 的类型 + AXAML build task。
-        runtime 资产排除，运行时由宿主 Default ALC（来自 ShiroBot.AvaloniaIntegration）提供同一份程序集。
-    -->
-    <ItemGroup>
-        <AvaloniaResource Include="Assets\**" />
-    </ItemGroup>
 
     <ItemGroup>
         <PackageReference Include="Avalonia" Version="12.0.4">
@@ -32,27 +15,75 @@
             <PrivateAssets>none</PrivateAssets>
             <IncludeAssets>compile; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         </PackageReference>
-        <PackageReference Include="ShiroBot.AvaloniaSdk" Version="0.5.0" />
-        <PackageReference Include="ShiroBot.SDK" Version="0.5.0" />
- </ItemGroup>
+        <PackageReference Include="ShiroBot.SDK" Version="0.6.0-rc1" />
+        <PackageReference Include="ShiroBot.AvaloniaSdk" Version="0.6.0" />
+        <PackageReference Include="ILRepack.Lib.MSBuild.Task" Version="2.0.44.1">
+            <PrivateAssets>all</PrivateAssets>
+            <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+        </PackageReference>
+    </ItemGroup>
 
-    <!--
-        拷贝到宿主 plugins/ 目录的 target。不挂 AfterTargets，避免 slnx 全量构建时无条件触发；
-        只能由 ShiroBot.csproj 在 EnableAvalonia=true 时通过 MSBuild Projects=... Targets="CopyPluginToHost" 显式调用。
-        这样 EnableAvalonia=false 时此插件虽然仍被 slnx 编译（保证 IDE 可调试 .axaml），但不会出现在宿主输出。
-    -->
+    <ItemGroup>
+        <None Update="Assets\**\*">
+            <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+            <CopyToPublishDirectory>Never</CopyToPublishDirectory>
+        </None>
+    </ItemGroup>
+
+    <Target Name="RepackPlugin" AfterTargets="Publish" Condition="'$(Configuration)'=='Release'">
+        <PropertyGroup>
+            <MergedPluginFile>$(PublishDir)$(AssemblyName).merged.dll</MergedPluginFile>
+            <MergedPluginPdb>$(PublishDir)$(AssemblyName).merged.pdb</MergedPluginPdb>
+            <PublishedPluginFile>$(PublishDir)$(AssemblyName).dll</PublishedPluginFile>
+            <PublishedPluginPdb>$(PublishDir)$(AssemblyName).pdb</PublishedPluginPdb>
+        </PropertyGroup>
+
+        <Delete Files="$(MergedPluginFile);$(MergedPluginPdb)" />
+        <Copy SourceFiles="$(TargetPath)" DestinationFiles="$(PublishedPluginFile)" OverwriteReadOnlyFiles="true" />
+        <Copy SourceFiles="$(TargetDir)$(AssemblyName).pdb" DestinationFiles="$(PublishedPluginPdb)" OverwriteReadOnlyFiles="true" Condition="Exists('$(TargetDir)$(AssemblyName).pdb')" />
+
+        <ItemGroup>
+            <RepackInput Include="$(PublishedPluginFile)" />
+            <RepackDependency Include="$(PublishDir)*.dll"
+                              Exclude="$(PublishedPluginFile);
+                                       $(MergedPluginFile);
+                                       $(PublishDir)ShiroBot.SDK.dll;
+                                       $(PublishDir)ShiroBot.Model.dll;
+                                       $(PublishDir)System*.dll;
+                                       $(PublishDir)mscorlib.dll;
+                                       $(PublishDir)netstandard.dll" />
+            <RepackInput Include="@(RepackDependency)" />
+        </ItemGroup>
+
+        <ILRepack
+                TargetKind="Dll"
+                OutputFile="$(MergedPluginFile)"
+                InputAssemblies="@(RepackInput)"
+                LibraryPath="$(PublishDir);$(TargetDir);@(ReferencePath->'%(RootDir)%(Directory)')"
+                Internalize="false"
+                Parallel="true"
+                DebugInfo="true" />
+
+        <Copy SourceFiles="$(MergedPluginFile)" DestinationFiles="$(PublishDir)$(AssemblyName).dll" OverwriteReadOnlyFiles="true" />
+        <Copy SourceFiles="$(MergedPluginPdb)" DestinationFiles="$(PublishedPluginPdb)" OverwriteReadOnlyFiles="true" Condition="Exists('$(MergedPluginPdb)')" />
+        <Delete Files="$(MergedPluginFile)" />
+        <Delete Files="$(MergedPluginPdb)" />
+        <Delete Files="@(RepackDependency)" />
+    </Target>
+
     <Target Name="CopyPluginToHost"
-            Condition="('$(Configuration)'=='Debug' or '$(Configuration)'=='DebugPlugin' or '$(Configuration)'=='DebugAll') and ('$(RequiresAvaloniaHost)'!='true' or '$(EnableAvalonia)'=='true')">
+            AfterTargets="Build"
+            Condition="'$(Configuration)'=='Debug' or '$(Configuration)'=='DebugPlugin' or '$(Configuration)'=='DebugAll'">
         <MakeDir Directories="$(HostPluginDir)" />
 
         <ItemGroup>
             <PluginDebugOutput Include="$(TargetDir)**\*"
-                               Exclude="$(TargetDir)ShiroBot.SDK.dll;$(TargetDir)ShiroBot.SDK.pdb;$(TargetDir)ShiroBot.Model.dll;$(TargetDir)ShiroBot.Model.pdb;$(TargetDir)ShiroBot.AvaloniaSdk.dll;$(TargetDir)ShiroBot.AvaloniaSdk.pdb;$(TargetDir)Avalonia*.dll;$(TargetDir)Avalonia*.pdb;$(TargetDir)SkiaSharp.dll;$(TargetDir)HarfBuzzSharp.dll" />
+                               Exclude="$(TargetDir)ShiroBot.SDK.dll;$(TargetDir)ShiroBot.SDK.pdb;$(TargetDir)ShiroBot.Model.dll;$(TargetDir)ShiroBot.Model.pdb" />
         </ItemGroup>
 
         <Copy SourceFiles="@(PluginDebugOutput)"
               DestinationFiles="@(PluginDebugOutput->'$(HostPluginDir)%(RecursiveDir)%(Filename)%(Extension)')"
               SkipUnchangedFiles="true" />
     </Target>
-    
+
 </Project>
