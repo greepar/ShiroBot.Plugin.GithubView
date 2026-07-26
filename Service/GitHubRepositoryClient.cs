@@ -1,6 +1,3 @@
-using System.Globalization;
-using System.Net.Http.Headers;
-using System.Text.Json;
 using Avalonia.Controls;
 using Avalonia.Media;
 using ShiroBot.Plugin.Github.Views;
@@ -8,37 +5,30 @@ using ShiroBot.Plugin.GithubView.Views;
 
 namespace ShiroBot.Plugin.GithubView.Service;
 
-internal sealed class GitHubRepositoryClient
+internal sealed class GitHubRepositoryClient(GitHubApiClient api)
 {
-    private static readonly HttpClient Http = CreateHttpClient();
-    private static readonly HttpClient ImageHttp = CreateImageHttpClient();
-
     public async Task<DescriptionCardViewModel> GetRepositoryCardAsync(
         string owner,
         string repository,
         CancellationToken ct = default)
     {
-        using var response = await Http.GetAsync($"repos/{owner}/{repository}", ct).ConfigureAwait(false);
-        response.EnsureSuccessStatusCode();
-
-        await using var stream = await response.Content.ReadAsStreamAsync(ct).ConfigureAwait(false);
-        using var document = await JsonDocument.ParseAsync(stream, cancellationToken: ct).ConfigureAwait(false);
+        using var document = await api.GetJsonAsync($"repos/{owner}/{repository}", ct).ConfigureAwait(false);
         var root = document.RootElement;
 
         var contributors = await GetContributorCountAsync(owner, repository, ct).ConfigureAwait(false);
-        var avatarBytes = await GetAvatarBytesAsync(GetString(root, "owner", "avatar_url"), ct).ConfigureAwait(false);
+        var avatarBytes = await api.GetImageAsync(root.GetStringOrNull("owner", "avatar_url"), ct).ConfigureAwait(false);
         var languages = await GetLanguagesOrDefaultAsync(owner, repository, ct).ConfigureAwait(false);
 
         return new DescriptionCardViewModel
         {
-            Owner = GetString(root, "owner", "login") ?? owner,
-            Repository = GetString(root, "name") ?? repository,
-            Description = GetString(root, "description") ?? "No description provided.",
-            Contributors = FormatCount(contributors),
-            Issues = FormatCount(GetInt(root, "open_issues_count")),
+            Owner = root.GetStringOrNull("owner", "login") ?? owner,
+            Repository = root.GetStringOrNull("name") ?? repository,
+            Description = root.GetStringOrNull("description") ?? "No description provided.",
+            Contributors = Formatting.Count(contributors),
+            Issues = Formatting.Count(root.GetIntOrZero("open_issues_count")),
             Discussions = "-",
-            Stars = FormatCount(GetInt(root, "stargazers_count")),
-            Forks = FormatCount(GetInt(root, "forks_count")),
+            Stars = Formatting.Count(root.GetIntOrZero("stargazers_count")),
+            Forks = Formatting.Count(root.GetIntOrZero("forks_count")),
             PrimaryLanguage = languages.PrimaryLanguage,
             AvatarBytes = avatarBytes ?? (string.Equals(owner, "ShirokaProject", StringComparison.OrdinalIgnoreCase)
                 && string.Equals(repository, "ShiroBot", StringComparison.OrdinalIgnoreCase)
@@ -57,31 +47,9 @@ internal sealed class GitHubRepositoryClient
         };
     }
 
-    private static async Task<byte[]?> GetAvatarBytesAsync(string? avatarUrl, CancellationToken ct)
+    private async Task<LanguageBar> GetLanguagesAsync(string owner, string repository, CancellationToken ct)
     {
-        if (string.IsNullOrWhiteSpace(avatarUrl)
-            || !Uri.TryCreate(avatarUrl, UriKind.Absolute, out var uri))
-        {
-            return null;
-        }
-
-        try
-        {
-            return await ImageHttp.GetByteArrayAsync(uri, ct).ConfigureAwait(false);
-        }
-        catch
-        {
-            return null;
-        }
-    }
-
-    private static async Task<LanguageBar> GetLanguagesAsync(string owner, string repository, CancellationToken ct)
-    {
-        using var response = await Http.GetAsync($"repos/{owner}/{repository}/languages", ct).ConfigureAwait(false);
-        response.EnsureSuccessStatusCode();
-
-        await using var stream = await response.Content.ReadAsStreamAsync(ct).ConfigureAwait(false);
-        using var document = await JsonDocument.ParseAsync(stream, cancellationToken: ct).ConfigureAwait(false);
+        using var document = await api.GetJsonAsync($"repos/{owner}/{repository}/languages", ct).ConfigureAwait(false);
         var languages = document.RootElement.EnumerateObject()
             .Select(property => new
             {
@@ -116,7 +84,7 @@ internal sealed class GitHubRepositoryClient
         return new LanguageBar(result, primaryLanguage);
     }
 
-    private static async Task<LanguageBar> GetLanguagesOrDefaultAsync(
+    private async Task<LanguageBar> GetLanguagesOrDefaultAsync(
         string owner,
         string repository,
         CancellationToken ct)
@@ -137,92 +105,17 @@ internal sealed class GitHubRepositoryClient
         }
     }
 
-    private static async Task<int> GetContributorCountAsync(string owner, string repository, CancellationToken ct)
+    private async Task<int> GetContributorCountAsync(string owner, string repository, CancellationToken ct)
     {
-        using var response = await Http.GetAsync($"repos/{owner}/{repository}/contributors?per_page=1&anon=true", ct)
-            .ConfigureAwait(false);
-
-        response.EnsureSuccessStatusCode();
-
-        if (response.Headers.TryGetValues("Link", out var values))
+        try
         {
-            var count = TryReadLastPage(values);
-            if (count is not null)
-            {
-                return count.Value;
-            }
+            return await api.GetCollectionCountAsync(
+                $"repos/{owner}/{repository}/contributors?per_page=1&anon=true", ct).ConfigureAwait(false);
         }
-
-        await using var stream = await response.Content.ReadAsStreamAsync(ct).ConfigureAwait(false);
-        using var document = await JsonDocument.ParseAsync(stream, cancellationToken: ct).ConfigureAwait(false);
-        return document.RootElement.ValueKind == JsonValueKind.Array
-            ? document.RootElement.GetArrayLength()
-            : 0;
-    }
-
-    private static int? TryReadLastPage(IEnumerable<string> links)
-    {
-        foreach (var part in string.Join(',', links).Split(','))
+        catch
         {
-            if (!part.Contains("rel=\"last\"", StringComparison.OrdinalIgnoreCase))
-            {
-                continue;
-            }
-
-            var pageIndex = part.IndexOf("page=", StringComparison.OrdinalIgnoreCase);
-            if (pageIndex < 0)
-            {
-                continue;
-            }
-
-            pageIndex += "page=".Length;
-            var endIndex = pageIndex;
-            while (endIndex < part.Length && char.IsDigit(part[endIndex]))
-            {
-                endIndex++;
-            }
-
-            if (int.TryParse(part[pageIndex..endIndex], NumberStyles.None, CultureInfo.InvariantCulture, out var page))
-            {
-                return page;
-            }
+            return 0;
         }
-
-        return null;
-    }
-
-    private static string? GetString(JsonElement root, string propertyName)
-    {
-        return root.TryGetProperty(propertyName, out var property) && property.ValueKind == JsonValueKind.String
-            ? property.GetString()
-            : null;
-    }
-
-    private static string? GetString(JsonElement root, string objectName, string propertyName)
-    {
-        return root.TryGetProperty(objectName, out var obj)
-               && obj.ValueKind == JsonValueKind.Object
-               && obj.TryGetProperty(propertyName, out var property)
-               && property.ValueKind == JsonValueKind.String
-            ? property.GetString()
-            : null;
-    }
-
-    private static int GetInt(JsonElement root, string propertyName)
-    {
-        return root.TryGetProperty(propertyName, out var property) && property.TryGetInt32(out var value)
-            ? value
-            : 0;
-    }
-
-    private static string FormatCount(int count)
-    {
-        return count switch
-        {
-            >= 1_000_000 => (count / 1_000_000d).ToString("0.#M", CultureInfo.InvariantCulture),
-            >= 1_000 => (count / 1_000d).ToString("0.#k", CultureInfo.InvariantCulture),
-            _ => count.ToString(CultureInfo.InvariantCulture)
-        };
     }
 
     private static Color GetLanguageColor(string language)
@@ -256,27 +149,6 @@ internal sealed class GitHubRepositoryClient
             "Jupyter Notebook" => Color.Parse("#DA5B0B"),
             _ => Color.Parse("#8C959F")
         };
-    }
-
-    private static HttpClient CreateHttpClient()
-    {
-        var http = new HttpClient
-        {
-            BaseAddress = new Uri("https://api.github.com/")
-        };
-
-        http.DefaultRequestHeaders.UserAgent.Add(new ProductInfoHeaderValue("ShiroBot-AvaloniaDemoPlugin", "1.0"));
-        http.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/vnd.github+json"));
-        http.DefaultRequestHeaders.Add("X-GitHub-Api-Version", "2022-11-28");
-        return http;
-    }
-
-    private static HttpClient CreateImageHttpClient()
-    {
-        var http = new HttpClient();
-        http.DefaultRequestHeaders.UserAgent.Add(new ProductInfoHeaderValue("ShiroBot-AvaloniaDemoPlugin", "1.0"));
-        http.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("image/*"));
-        return http;
     }
 
     private sealed record LanguageBar(LanguageBarSegment[] Segments, string PrimaryLanguage)

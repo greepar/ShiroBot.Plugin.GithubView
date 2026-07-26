@@ -10,12 +10,17 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="ShiroBot.AvaloniaSdk" Version="0.6.0" />
+        <ProjectReference Include="..\ShiroBot.AvaloniaSdk\ShiroBot.AvaloniaSdk.csproj">
+            <Private>false</Private>
+        </ProjectReference>
         <PackageReference Include="ILRepack.Lib.MSBuild.Task" Version="2.0.45">
             <PrivateAssets>all</PrivateAssets>
             <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         </PackageReference>
-        <PackageReference Include="ShiroBot.SDK" Version="0.6.0-rc1" />
+        <ProjectReference Include="..\ShiroBot.SDK\ShiroBot.SDK.csproj">
+            <Private>false</Private>
+        </ProjectReference>
+        <PackageReference Include="Markdown.Avalonia.Tight" Version="12.0.0-a3" />
     </ItemGroup>
 
     <Target Name="RepackPlugin" AfterTargets="Publish" Condition="'$(Configuration)'=='Release'">
@@ -32,9 +37,13 @@
 
         <ItemGroup>
             <RepackInput Include="$(PublishedPluginFile)" />
+            <!-- Markdown.Avalonia 系列含各自的 CompiledAvaloniaXaml 类型,无法与插件合并,作为伴随 DLL 发布 -->
             <RepackDependency Include="$(PublishDir)*.dll"
                               Exclude="$(PublishedPluginFile);
                                         $(MergedPluginFile);
+                                        $(PublishDir)Markdown.Avalonia.dll;
+                                        $(PublishDir)ColorDocument.Avalonia.dll;
+                                        $(PublishDir)ColorTextBlock.Avalonia.dll;
                                         $(PublishDir)Avalonia*.dll;
                                         $(PublishDir)HarfBuzzSharp.dll;
                                         $(PublishDir)MicroCom.Runtime.dll;
