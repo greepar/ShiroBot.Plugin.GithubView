@@ -30,6 +30,10 @@ public sealed class IssueDetailCardViewModel
     public bool HasBody => !string.IsNullOrWhiteSpace(Body);
     public bool BodyTruncated { get; init; }
 
+    // 正文 Markdown 区域最大高度(超出被裁剪);脚注在字符截断或可能视觉溢出时显示
+    public double BodyMaxHeight => 600;
+    public bool ShowTruncatedNote => BodyTruncated || MarkdownHeightEstimator.MayOverflow(Body, BodyMaxHeight);
+
     public IReadOnlyList<LabelChip> Labels { get; init; } = [];
     public bool HasLabels => Labels.Count > 0;
 

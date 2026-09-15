@@ -22,4 +22,7 @@ public sealed class ReleaseCardViewModel
     public string Body { get; init; } = "";
     public bool HasBody => !string.IsNullOrWhiteSpace(Body);
     public bool BodyTruncated { get; init; }
+
+    public double BodyMaxHeight => 700;
+    public bool ShowTruncatedNote => BodyTruncated || MarkdownHeightEstimator.MayOverflow(Body, BodyMaxHeight);
 }

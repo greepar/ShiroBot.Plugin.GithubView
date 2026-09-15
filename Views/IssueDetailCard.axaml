@@ -113,7 +113,7 @@
                 </ItemsControl.ItemTemplate>
             </ItemsControl>
 
-            <!-- 正文 (Markdown) -->
+            <!-- 正文 (Markdown),超高裁剪 -->
             <Border IsVisible="{Binding HasBody}"
                     Background="#F6F8FA"
                     CornerRadius="8"
@@ -121,9 +121,16 @@
                     BorderThickness="1"
                     Padding="16,12">
                 <StackPanel Spacing="8">
-                    <md:MarkdownScrollViewer Markdown="{Binding Body}"/>
+                    <Border MaxHeight="{Binding BodyMaxHeight}"
+                            VerticalAlignment="Top"
+                            ClipToBounds="True">
+                        <md:MarkdownScrollViewer Markdown="{Binding Body}"
+                                                 VerticalAlignment="Top"
+                                                 ScrollViewer.VerticalScrollBarVisibility="Hidden"
+                                                 ScrollViewer.HorizontalScrollBarVisibility="Disabled"/>
+                    </Border>
                     <TextBlock Text="…内容过长已截断"
-                               IsVisible="{Binding BodyTruncated}"
+                               IsVisible="{Binding ShowTruncatedNote}"
                                FontSize="13"
                                Foreground="#8C959F"/>
                 </StackPanel>

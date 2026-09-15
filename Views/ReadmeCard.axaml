@@ -37,11 +37,18 @@
                 </Grid>
             </Border>
 
-            <!-- Markdown 正文 -->
+            <!-- Markdown 正文,超高裁剪 -->
             <StackPanel Margin="28,20,28,24" Spacing="10">
-                <md:MarkdownScrollViewer Markdown="{Binding Markdown}"/>
+                <Border MaxHeight="{Binding BodyMaxHeight}"
+                        VerticalAlignment="Top"
+                        ClipToBounds="True">
+                    <md:MarkdownScrollViewer Markdown="{Binding Markdown}"
+                                             VerticalAlignment="Top"
+                                             ScrollViewer.VerticalScrollBarVisibility="Hidden"
+                                             ScrollViewer.HorizontalScrollBarVisibility="Disabled"/>
+                </Border>
                 <TextBlock Text="…内容过长已截断,完整内容请访问仓库页面"
-                           IsVisible="{Binding Truncated}"
+                           IsVisible="{Binding ShowTruncatedNote}"
                            FontSize="13"
                            Foreground="#8C959F"/>
             </StackPanel>

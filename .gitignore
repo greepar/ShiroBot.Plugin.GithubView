@@ -3,3 +3,6 @@ obj/
 .DS_Store
 *.user
 *.suo
+ShiroBot/plugins/**/*.dll
+ShiroBot/plugins/**/*.pdb
+ShiroBot/plugins/**/*.deps.json

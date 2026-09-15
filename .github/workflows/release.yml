@@ -34,16 +34,31 @@ jobs:
       - name: Publish
         run: dotnet publish "$PROJECT_DIR" --configuration Release
 
-      - name: Collect Plugin DLL
+      - name: Verify single-DLL plugin package
         shell: bash
         run: |
-          PROJECT="$(basename "$(ls *.csproj | head -1)" .csproj)"
+          set -euo pipefail
+          PROJECT="ShiroBot.Plugin.GithubView"
           PLUGIN_DLL="$PUBLISH_DIR/${PROJECT}.dll"
           if [ ! -f "$PLUGIN_DLL" ]; then
             echo "Plugin DLL not found: $PLUGIN_DLL"
             ls -la "$PUBLISH_DIR"
             exit 1
           fi
+
+          mapfile -t ASSEMBLIES < <(find "$PUBLISH_DIR" -maxdepth 1 -type f -name '*.dll' -printf '%f\n' | sort)
+          if [ "${#ASSEMBLIES[@]}" -ne 1 ] || [ "${ASSEMBLIES[0]}" != "${PROJECT}.dll" ]; then
+            printf 'Expected only %s.dll, found:\n' "$PROJECT"
+            printf '%s\n' "${ASSEMBLIES[@]}"
+            exit 1
+          fi
+
+          if find "$PUBLISH_DIR" -type f \( -iname 'ShiroBot.SDK.dll' -o -iname 'ShiroBot.Model.*.dll' -o -iname 'Avalonia*.dll' -o -iname 'SkiaSharp*.dll' -o -iname 'HarfBuzzSharp*.dll' -o -iname 'MicroCom*.dll' \) -print -quit | grep -q .; then
+            echo "Host-shared assemblies were published."
+            find "$PUBLISH_DIR" -type f -name '*.dll' -printf '%P\n' | sort
+            exit 1
+          fi
+
           mkdir -p release
           cp "$PLUGIN_DLL" release/
 

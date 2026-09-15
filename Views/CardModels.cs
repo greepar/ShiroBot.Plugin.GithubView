@@ -69,6 +69,32 @@ internal static class AvatarHelper
 }
 
 /// <summary>
+/// 粗略估算 Markdown 渲染高度,用于判断内容是否可能超出 MaxHeight 被裁剪
+/// (headless 一次性渲染拿不到布局后的实际高度,只能预估;宁可多显示脚注也不误导)。
+/// </summary>
+public static class MarkdownHeightEstimator
+{
+    public static bool MayOverflow(string markdown, double maxHeight)
+    {
+        if (string.IsNullOrEmpty(markdown))
+        {
+            return false;
+        }
+
+        // 估算:普通行 ~22px,标题行 ~40px,长行按 ~85 字符/行折行。
+        // 只有估算高度明显超过 maxHeight 才报(估算偏保守,轻微超出时内容大概率未被裁)。
+        double height = 0;
+        foreach (var line in markdown.Split('\n'))
+        {
+            var wraps = 1 + line.Length / 85;
+            height += line.TrimStart().StartsWith('#') ? 40 : wraps * 22;
+        }
+
+        return height > maxHeight * 1.15;
+    }
+}
+
+/// <summary>
 /// GitHub 状态配色。
 /// </summary>
 public static class GitHubColors
