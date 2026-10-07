@@ -1,10 +1,12 @@
 using ShiroBot.AvaloniaSdk;
-using ShiroBot.Model.Common;
 using ShiroBot.Plugin.Github.Views;
 using ShiroBot.Plugin.GithubView.Service;
 using ShiroBot.SDK.Abstractions;
 using ShiroBot.SDK.Core;
 using ShiroBot.SDK.Plugin;
+using ShiroBot.SDK.Models;
+
+[assembly: ShiroBotApiCompatibility("0.9.2", "0.9.2")]
 
 namespace ShiroBot.Plugin.GithubView;
 
@@ -29,7 +31,7 @@ public sealed class GithubViewPlugin : PluginBase
         return Task.CompletedTask;
     }
 
-    private async Task HandleGroupGitHubRenderAsync(GroupIncomingMessage message)
+    private async Task HandleGroupGitHubRenderAsync(MessageEvent message)
     {
         BotLog.Info($"检测到 GitHub 链接，尝试解析: {message.GetPlainText()}");
         if (!TryReadGitHubRepository(message.GetPlainText(), out var owner, out var repository))
@@ -57,7 +59,7 @@ public sealed class GithubViewPlugin : PluginBase
         }
     }
 
-    private async Task<ImageOutgoingSegment?> RenderAsync(
+    private async Task<ImageSegment?> RenderAsync(
         string owner = "ShirokaProject",
         string repository = "ShiroBot")
     {
@@ -73,7 +75,7 @@ public sealed class GithubViewPlugin : PluginBase
             vm, 
             new ControlRenderOptions(RenderTheme.Auto));
 
-        return new ImageOutgoingSegment("base64://" + Convert.ToBase64String(png));
+        return new ImageSegment("base64://" + Convert.ToBase64String(png));
     }
     
     private static bool TryReadGitHubRepository(string text, out string owner, out string repository)
