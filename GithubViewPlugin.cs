@@ -12,8 +12,9 @@ namespace ShiroBot.Plugin.GithubView;
 
 [BotPlugin(id: "GithubView",
     Name = "Github 预览插件",
-    Version = "1.1.0",
+    Version = "1.1.1",
     Author = "greepar",
+    Category = PluginCategory.Render,
     Description = "解析 GitHub 仓库链接并渲染相关信息卡片。",
     GithubRepo = "greepar/ShiroBot.Plugin.GithubView",
     IsPluginSingleFile = true)
@@ -22,7 +23,7 @@ public sealed class GithubViewPlugin : PluginBase
 {
     private readonly GitHubRepositoryClient _github = new();
 
-    public override string Name => "GithubPlugin";
+    public override string Name => "Github 预览插件";
 
     protected override Task LoadAsync()
     {
