@@ -3,194 +3,209 @@
              xmlns:views="clr-namespace:ShiroBot.Plugin.GithubView.Views"
              x:Class="ShiroBot.Plugin.Github.Views.DescriptionCard"
              x:DataType="views:DescriptionCardViewModel"
-             Width="700" MinHeight="350">
-    
+             Width="760">
+
     <Design.DataContext>
-        <views:DescriptionCardViewModel/>
+        <views:DescriptionCardViewModel ReadmeHint="回复 readme 查看完整 README"/>
     </Design.DataContext>
-    
-   <Border 
-        Background="#FFFFFF" 
-        CornerRadius="10" 
-        BorderBrush="#D0D7DE" 
-        BorderThickness="1" 
-        ClipToBounds="True">
-    <Grid RowDefinitions="*, Auto, Auto, 6">
-        <Grid Grid.Row="0" ColumnDefinitions="*, Auto" Margin="32,32,32,24">
-            <Grid Grid.Column="0" RowDefinitions="Auto,Auto,Auto" 
-                        VerticalAlignment="Center" Margin="0,0,24,0">
-                <TextBlock Grid.Row="0" Text="{Binding OwnerDisplay}" 
-                           Margin="0,0,0,0"
-                           FontSize="24" 
-                           Foreground="#57606A" 
-                           FontWeight="Light"
-                           TextWrapping="Wrap"
-                           TextTrimming="CharacterEllipsis"
-                           MaxLines="1"/>
-                
-                <TextBlock Grid.Row="1"  Text="{Binding Repository}" 
-                           FontSize="48" 
-                           Foreground="#24292F" 
-                           FontWeight="Bold" 
-                           Margin="0,0,0,0"
-                           TextWrapping="Wrap"
-                           TextTrimming="CharacterEllipsis"
-                           HorizontalAlignment="Left"
-                           Width="450"
-                           MaxLines="2"/>
-                 
-                <TextBlock Grid.Row="2"  Text="{Binding Description}" 
-                           HorizontalAlignment="Left"
-                           Width="430"
-                           FontSize="18" 
-                           Foreground="#57606A" 
-                           TextWrapping="Wrap" 
-                           TextTrimming="CharacterEllipsis"
-                           MaxLines="4"
-                           LineHeight="26"/>
-            </Grid>
-            
-            <Border Grid.Column="1" 
-                    Width="140" 
-                    Height="140" 
-                    CornerRadius="16" 
-                    VerticalAlignment="Center"
-                    Background="Transparent"
-                    ClipToBounds="True">
-                <Grid>
-                    <Image Source="{Binding Avatar}"
-                           IsVisible="{Binding HasAvatar}"
-                           Stretch="UniformToFill"/>
-                    <TextBlock Text="{Binding OwnerInitial}"
-                               IsVisible="{Binding HasNoAvatar}"
-                               HorizontalAlignment="Center"
-                               VerticalAlignment="Center"
-                               FontSize="64"
+
+    <UserControl.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <views:GitHubTheme/>
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </UserControl.Resources>
+
+    <UserControl.Styles>
+        <Style Selector="TextBlock.value">
+            <Setter Property="FontSize" Value="18"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="Foreground" Value="{DynamicResource Gh.Fg}"/>
+            <Setter Property="VerticalAlignment" Value="Center"/>
+        </Style>
+        <Style Selector="TextBlock.caption">
+            <Setter Property="FontSize" Value="14"/>
+            <Setter Property="Foreground" Value="{DynamicResource Gh.FgMuted}"/>
+            <Setter Property="Margin" Value="24,4,0,0"/>
+        </Style>
+        <Style Selector="Path.icon">
+            <Setter Property="Fill" Value="{DynamicResource Gh.FgMuted}"/>
+            <Setter Property="Width" Value="16"/>
+            <Setter Property="Height" Value="16"/>
+            <Setter Property="Stretch" Value="Uniform"/>
+            <Setter Property="VerticalAlignment" Value="Center"/>
+        </Style>
+    </UserControl.Styles>
+
+    <Border Background="{DynamicResource Gh.Canvas}"
+            BorderBrush="{DynamicResource Gh.CardBorder}"
+            BorderThickness="1"
+            CornerRadius="12"
+            ClipToBounds="True">
+        <Grid RowDefinitions="Auto,Auto,Auto">
+
+            <!-- 上半：名称 / 简介 / README 提示 + 头像 -->
+            <Grid Grid.Row="0" ColumnDefinitions="*,Auto" Margin="36,36,36,28">
+                <StackPanel Grid.Column="0" Spacing="6" Margin="0,0,32,0" VerticalAlignment="Center">
+                    <TextBlock Text="{Binding OwnerDisplay}"
+                               FontSize="24"
+                               FontWeight="Light"
+                               Foreground="{DynamicResource Gh.FgMuted}"
+                               TextTrimming="CharacterEllipsis"/>
+                    <TextBlock Text="{Binding Repository}"
+                               FontSize="46"
                                FontWeight="Bold"
-                               Foreground="#FFFFFF"/>
-                </Grid>
-            </Border>
-        </Grid>
+                               Foreground="{DynamicResource Gh.Fg}"
+                               LineHeight="54"
+                               TextWrapping="Wrap"
+                               TextTrimming="CharacterEllipsis"
+                               MaxLines="2"/>
+                    <TextBlock Text="{Binding Description}"
+                               Margin="0,4,0,0"
+                               FontSize="18"
+                               LineHeight="27"
+                               Foreground="{DynamicResource Gh.FgMuted}"
+                               TextWrapping="Wrap"
+                               TextTrimming="CharacterEllipsis"
+                               MaxLines="3"/>
 
-        <!-- 下半部分：统计数据区 -->
-        <Grid Grid.Row="1" Margin="32,0,32,32" ColumnDefinitions="*,Auto">
-
-            <!-- 左侧5个数据项 -->
-            <StackPanel Grid.Column="0" Orientation="Horizontal" Spacing="40" VerticalAlignment="Bottom">
-                
-                <!-- Contributors -->
-                <StackPanel>
-                    <StackPanel Orientation="Horizontal" Spacing="8">
-                        <Path Data="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z" Fill="#57606A" Width="16" Height="16" Stretch="Uniform"/>
-                        <TextBlock Text="{Binding Contributors}" FontSize="18" FontWeight="SemiBold" Foreground="#24292F"/>
-                    </StackPanel>
-                    <TextBlock Text="Contributors" FontSize="14" Foreground="#57606A" Margin="24,4,0,0"/>
+                    <!-- README 回复提示 -->
+                        <Border IsVisible="{Binding HasReadmeHint}"
+                                HorizontalAlignment="Left"
+                                Margin="0,14,0,0"
+                                Height="28"
+                                Padding="11,0,13,0"
+                                CornerRadius="14"
+                                Background="{DynamicResource Gh.HintBackground}"
+                                BorderBrush="{DynamicResource Gh.Border}"
+                                BorderThickness="1">
+                            <StackPanel Orientation="Horizontal" Spacing="7" VerticalAlignment="Center">
+                                <Path Classes="icon" Width="14" Height="14"
+                                      Data="M6.78 1.97a.75.75 0 0 1 0 1.06L3.81 6h6.44A4.75 4.75 0 0 1 15 10.75v2.5a.75.75 0 0 1-1.5 0v-2.5a3.25 3.25 0 0 0-3.25-3.25H3.81l2.97 2.97a.749.749 0 0 1-.326 1.275.749.749 0 0 1-.734-.215L1.47 7.28a.75.75 0 0 1 0-1.06l4.25-4.25a.75.75 0 0 1 1.06 0Z"/>
+                                <TextBlock Text="{Binding ReadmeHint}"
+                                           FontSize="14"
+                                           Foreground="{DynamicResource Gh.FgMuted}"
+                                           VerticalAlignment="Center"/>
+                            </StackPanel>
+                        </Border>
                 </StackPanel>
 
-                <!-- Issues -->
-                <StackPanel>
-                    <StackPanel Orientation="Horizontal" Spacing="8">
-                        <Path Data="M8 1.5a6.5 6.5 0 100 13 6.5 6.5 0 000-13zM0 8a8 8 0 1116 0A8 8 0 010 8zm9 3a1 1 0 11-2 0 1 1 0 012 0zm-.25-6.25a.75.75 0 00-1.5 0v3.5a.75.75 0 001.5 0v-3.5z" Fill="#57606A" Width="16" Height="16" Stretch="Uniform"/>
-                        <TextBlock Text="{Binding Issues}" FontSize="18" FontWeight="SemiBold" Foreground="#24292F"/>
-                    </StackPanel>
-                    <TextBlock Text="Issues" FontSize="14" Foreground="#57606A" Margin="24,4,0,0"/>
-                </StackPanel>
-
-                <!-- Discussions -->
-                <StackPanel>
-                    <StackPanel Orientation="Horizontal" Spacing="8">
-                        <Path Data="M1.75 1h12.5c.966 0 1.75.784 1.75 1.75v8.5A1.75 1.75 0 0114.25 13H8.061l-2.574 2.573A1.458 1.458 0 013 14.543V13H1.75A1.75 1.75 0 010 11.25v-8.5C0 1.784.784 1 1.75 1zM1.5 2.75v8.5c0 .138.112.25.25.25h12.5a.25.25 0 00.25-.25v-8.5a.25.25 0 00-.25-.25H1.75a.25.25 0 00-.25.25z" Fill="#57606A" Width="16" Height="16" Stretch="Uniform"/>
-                        <TextBlock Text="{Binding Discussions}" FontSize="18" FontWeight="SemiBold" Foreground="#24292F"/>
-                    </StackPanel>
-                    <TextBlock Text="Discussions" FontSize="14" Foreground="#57606A" Margin="24,4,0,0"/>
-                </StackPanel>
-
-                <!-- Stars -->
-                <StackPanel>
-                    <StackPanel Orientation="Horizontal" Spacing="8">
-                        <Path Data="M8 .25a.75.75 0 01.673.418l1.882 3.815 4.21.612a.75.75 0 01.416 1.279l-3.046 2.97.719 4.192a.751.751 0 01-1.088.791L8 12.347l-3.766 1.98a.75.75 0 01-1.088-.79l.72-4.194L.818 6.374a.75.75 0 01.416-1.28l4.21-.611L7.327.668A.75.75 0 018 .25z" Fill="#57606A" Width="16" Height="16" Stretch="Uniform"/>
-                        <TextBlock Text="{Binding Stars}" FontSize="18" FontWeight="SemiBold" Foreground="#24292F"/>
-                    </StackPanel>
-                    <TextBlock Text="Stars" FontSize="14" Foreground="#57606A" Margin="24,4,0,0"/>
-                </StackPanel>
-
-                <!-- Forks -->
-                <StackPanel>
-                    <StackPanel Orientation="Horizontal" Spacing="8">
-                        <Path Data="M5 5.372v.878c0 .414.336.75.75.75h4.5a.75.75 0 00.75-.75v-.878a2.25 2.25 0 111.5 0v.878a2.25 2.25 0 01-2.25 2.25h-1.5v2.128a2.251 2.251 0 11-1.5 0V8.5h-1.5A2.25 2.25 0 013 6.25v-.878a2.25 2.25 0 111.5 0ZM5 3.25a.75.75 0 10-1.5 0 .75.75 0 001.5 0Zm6.75.75a.75.75 0 100-1.5.75.75 0 000 1.5Zm-3 8.75a.75.75 0 10-1.5 0 .75.75 0 001.5 0Z" Fill="#57606A" Width="16" Height="16" Stretch="Uniform"/>
-                        <TextBlock Text="{Binding Forks}" FontSize="18" FontWeight="SemiBold" Foreground="#24292F"/>
-                    </StackPanel>
-                    <TextBlock Text="Forks" FontSize="14" Foreground="#57606A" Margin="24,4,0,0"/>
-                </StackPanel>
-
-            </StackPanel>
-
-            <!-- 右侧 GitHub Logo (用圆形和简单路径近似代替，建议自己换标准图标) -->
-            <Path Grid.Column="1" VerticalAlignment="Bottom" Data="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z" Fill="#8C959F" Width="28" Height="28" Stretch="Uniform"/>
-        </Grid>
-
-        <!-- 最底部的语言颜色条 (按比例分配宽度) -->
-        <Grid Row="3" ColumnDefinitions="Auto,*" Height="40">
-            <Border Grid.Column="0"
-                        HorizontalAlignment="Left"
+                <Border Grid.Column="1"
+                        Width="148" Height="148"
+                        CornerRadius="20"
                         VerticalAlignment="Center"
-                        Margin="8,0,4,14"
-                        >
-                <Grid ColumnDefinitions="Auto,*" VerticalAlignment="Center">
-                    <Ellipse Grid.Column="0" Width="10" Height="10"
-                             Margin="0 0 5 0"
-                             VerticalAlignment="Center">
+                        ClipToBounds="True">
+                    <Grid>
+                        <Image Source="{Binding Avatar}"
+                               IsVisible="{Binding HasAvatar}"
+                               Stretch="UniformToFill"/>
+                        <Border Background="{DynamicResource Gh.Placeholder}" IsVisible="{Binding HasNoAvatar}"/>
+                        <TextBlock Text="{Binding OwnerInitial}"
+                                   IsVisible="{Binding HasNoAvatar}"
+                                   HorizontalAlignment="Center"
+                                   VerticalAlignment="Center"
+                                   FontSize="64"
+                                   FontWeight="Bold"
+                                   Foreground="#FFFFFF"/>
+                    </Grid>
+                </Border>
+            </Grid>
+
+            <!-- 统计 -->
+            <Grid Grid.Row="1" ColumnDefinitions="*,Auto" Margin="36,0,36,26">
+                <StackPanel Grid.Column="0" Orientation="Horizontal" Spacing="44" VerticalAlignment="Bottom">
+                    <StackPanel>
+                        <StackPanel Orientation="Horizontal" Spacing="8">
+                            <Path Classes="icon" Data="M2 5.5a3.5 3.5 0 1 1 5.898 2.549 5.508 5.508 0 0 1 3.034 4.084.75.75 0 1 1-1.482.235 4 4 0 0 0-7.9 0 .75.75 0 0 1-1.482-.236A5.507 5.507 0 0 1 3.102 8.05 3.493 3.493 0 0 1 2 5.5ZM11 4a3.001 3.001 0 0 1 2.22 5.018 5.01 5.01 0 0 1 2.56 3.012.749.749 0 0 1-.885.954.752.752 0 0 1-.549-.514 3.507 3.507 0 0 0-2.522-2.372.75.75 0 0 1-.574-.73v-.352a.75.75 0 0 1 .416-.672A1.5 1.5 0 0 0 11 5.5.75.75 0 0 1 11 4Zm-5.5-.5a2 2 0 1 0-.001 3.999A2 2 0 0 0 5.5 3.5Z"/>
+                            <TextBlock Classes="value" Text="{Binding Contributors}"/>
+                        </StackPanel>
+                        <TextBlock Classes="caption" Text="Contributors"/>
+                    </StackPanel>
+
+                    <StackPanel>
+                        <StackPanel Orientation="Horizontal" Spacing="8">
+                            <Path Classes="icon" Data="M8 9.5a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3Z M8 0a8 8 0 1 1 0 16A8 8 0 0 1 8 0ZM1.5 8a6.5 6.5 0 1 0 13 0 6.5 6.5 0 0 0-13 0Z"/>
+                            <TextBlock Classes="value" Text="{Binding Issues}"/>
+                        </StackPanel>
+                        <TextBlock Classes="caption" Text="Issues"/>
+                    </StackPanel>
+
+                    <StackPanel>
+                        <StackPanel Orientation="Horizontal" Spacing="8">
+                            <Path Classes="icon" Data="M8 2c1.981 0 3.671.992 4.933 2.078 1.27 1.091 2.187 2.345 2.637 3.023a1.62 1.62 0 0 1 0 1.798c-.45.678-1.367 1.932-2.637 3.023C11.67 13.008 9.981 14 8 14c-1.981 0-3.671-.992-4.933-2.078C1.797 10.83.88 9.576.43 8.898a1.62 1.62 0 0 1 0-1.798c.45-.677 1.367-1.931 2.637-3.022C4.33 2.992 6.019 2 8 2ZM1.679 7.932a.12.12 0 0 0 0 .136c.411.622 1.241 1.75 2.366 2.717C5.176 11.758 6.527 12.5 8 12.5c1.473 0 2.825-.742 3.955-1.715 1.124-.967 1.954-2.096 2.366-2.717a.12.12 0 0 0 0-.136c-.412-.621-1.242-1.75-2.366-2.717C10.824 4.242 9.473 3.5 8 3.5c-1.473 0-2.825.742-3.955 1.715-1.124.967-1.954 2.096-2.366 2.717ZM8 10a2 2 0 1 1-.001-3.999A2 2 0 0 1 8 10Z"/>
+                            <TextBlock Classes="value" Text="{Binding Watchers}"/>
+                        </StackPanel>
+                        <TextBlock Classes="caption" Text="Watchers"/>
+                    </StackPanel>
+
+                    <StackPanel>
+                        <StackPanel Orientation="Horizontal" Spacing="8">
+                            <Path Classes="icon" Data="M8 .25a.75.75 0 0 1 .673.418l1.882 3.815 4.21.612a.75.75 0 0 1 .416 1.279l-3.046 2.97.719 4.192a.751.751 0 0 1-1.088.791L8 12.347l-3.766 1.98a.75.75 0 0 1-1.088-.79l.72-4.194L.818 6.374a.75.75 0 0 1 .416-1.28l4.21-.611L7.327.668A.75.75 0 0 1 8 .25Z"/>
+                            <TextBlock Classes="value" Text="{Binding Stars}"/>
+                        </StackPanel>
+                        <TextBlock Classes="caption" Text="Stars"/>
+                    </StackPanel>
+
+                    <StackPanel>
+                        <StackPanel Orientation="Horizontal" Spacing="8">
+                            <Path Classes="icon" Data="M5 5.372v.878c0 .414.336.75.75.75h4.5a.75.75 0 0 0 .75-.75v-.878a2.25 2.25 0 1 1 1.5 0v.878a2.25 2.25 0 0 1-2.25 2.25h-1.5v2.128a2.251 2.251 0 1 1-1.5 0V8.5h-1.5A2.25 2.25 0 0 1 3 6.25v-.878a2.25 2.25 0 1 1 1.5 0ZM5 3.25a.75.75 0 1 0-1.5 0 .75.75 0 0 0 1.5 0Zm6.75.75a.75.75 0 1 0 0-1.5.75.75 0 0 0 0 1.5Zm-3 8.75a.75.75 0 1 0-1.5 0 .75.75 0 0 0 1.5 0Z"/>
+                            <TextBlock Classes="value" Text="{Binding Forks}"/>
+                        </StackPanel>
+                        <TextBlock Classes="caption" Text="Forks"/>
+                    </StackPanel>
+                </StackPanel>
+
+                <Path Grid.Column="1" Classes="icon" Width="30" Height="30" VerticalAlignment="Center"
+                      Fill="{DynamicResource Gh.FgSubtle}"
+                      Data="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/>
+            </Grid>
+
+            <!-- 左下角主语言 + 语言占比条 -->
+            <Grid Grid.Row="2" ColumnDefinitions="Auto,*" Margin="36,0,36,28">
+                <StackPanel Grid.Column="0" Orientation="Horizontal" Spacing="8" Margin="0,0,16,0"
+                            VerticalAlignment="Center">
+                    <Ellipse Width="12" Height="12" VerticalAlignment="Center">
                         <Ellipse.Fill>
                             <SolidColorBrush Color="{Binding Language1Color}"/>
                         </Ellipse.Fill>
                     </Ellipse>
-                
-                    <TextBlock Grid.Column="1" 
-                               Margin="0 0 0 1"
-                               Foreground="#57606A" 
-                               Text="{Binding PrimaryLanguage}"
+                    <TextBlock Text="{Binding PrimaryLanguage}"
+                               FontSize="15"
+                               FontWeight="SemiBold"
+                               Foreground="{DynamicResource Gh.FgMuted}"
                                VerticalAlignment="Center"/>
-                </Grid>
-            </Border>
-            
-            <Grid Column="1" Height="10"
-                  Margin="0 0 0 15">
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="{Binding Language1Width}"/>
-                    <ColumnDefinition Width="{Binding Language2Width}"/>
-                    <ColumnDefinition Width="{Binding Language3Width}"/>
-                    <ColumnDefinition Width="{Binding Language4Width}"/>
-                    <ColumnDefinition Width="{Binding Language5Width}"/>
-                </Grid.ColumnDefinitions>
-            
-                <Border Grid.Column="0" CornerRadius="8,0,0,8">
-                    <Border.Background>
-                        <SolidColorBrush Color="{Binding Language1Color}"/>
-                    </Border.Background>
+                </StackPanel>
+
+                <Border Grid.Column="1" Height="8" CornerRadius="4" ClipToBounds="True"
+                        VerticalAlignment="Center"
+                        Background="{DynamicResource Gh.Divider}">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="{Binding Language1Width}"/>
+                            <ColumnDefinition Width="{Binding Language2Width}"/>
+                            <ColumnDefinition Width="{Binding Language3Width}"/>
+                            <ColumnDefinition Width="{Binding Language4Width}"/>
+                            <ColumnDefinition Width="{Binding Language5Width}"/>
+                        </Grid.ColumnDefinitions>
+                        <Rectangle Grid.Column="0">
+                            <Rectangle.Fill><SolidColorBrush Color="{Binding Language1Color}"/></Rectangle.Fill>
+                        </Rectangle>
+                        <Rectangle Grid.Column="1">
+                            <Rectangle.Fill><SolidColorBrush Color="{Binding Language2Color}"/></Rectangle.Fill>
+                        </Rectangle>
+                        <Rectangle Grid.Column="2">
+                            <Rectangle.Fill><SolidColorBrush Color="{Binding Language3Color}"/></Rectangle.Fill>
+                        </Rectangle>
+                        <Rectangle Grid.Column="3">
+                            <Rectangle.Fill><SolidColorBrush Color="{Binding Language4Color}"/></Rectangle.Fill>
+                        </Rectangle>
+                        <Rectangle Grid.Column="4">
+                            <Rectangle.Fill><SolidColorBrush Color="{Binding Language5Color}"/></Rectangle.Fill>
+                        </Rectangle>
+                    </Grid>
                 </Border>
-                <Rectangle Grid.Column="1">
-                    <Rectangle.Fill>
-                        <SolidColorBrush Color="{Binding Language2Color}"/>
-                    </Rectangle.Fill>
-                </Rectangle>
-                <Rectangle Grid.Column="2">
-                    <Rectangle.Fill>
-                        <SolidColorBrush Color="{Binding Language3Color}"/>
-                    </Rectangle.Fill>
-                </Rectangle>
-                <Rectangle Grid.Column="3">
-                    <Rectangle.Fill>
-                        <SolidColorBrush Color="{Binding Language4Color}"/>
-                    </Rectangle.Fill>
-                </Rectangle>
-                <Rectangle Grid.Column="4">
-                    <Rectangle.Fill>
-                        <SolidColorBrush Color="{Binding Language5Color}"/>
-                    </Rectangle.Fill>
-                </Rectangle>
             </Grid>
         </Grid>
-        
-    </Grid>
-</Border>
+    </Border>
 </UserControl>

@@ -18,7 +18,7 @@ public sealed class DescriptionCardViewModel
 
     public string Contributors { get; init; } = "1";
     public string Issues { get; init; } = "0";
-    public string Discussions { get; init; } = "-";
+    public string Watchers { get; init; } = "3";
     public string Stars { get; init; } = "0";
     public string Forks { get; init; } = "0";
     public string PrimaryLanguage { get; init; } = "C#";
@@ -35,6 +35,10 @@ public sealed class DescriptionCardViewModel
     public Color Language4Color { get; init; } = Colors.Transparent;
     public Color Language5Color { get; init; } = Colors.Transparent;
     
+    /// <summary>非空时在简介下方显示“回复 readme”提示。</summary>
+    public string? ReadmeHint { get; set; }
+
+    public bool HasReadmeHint => !string.IsNullOrEmpty(ReadmeHint);
     public string OwnerDisplay => Owner + "/";
     public string OwnerInitial => string.IsNullOrWhiteSpace(Owner) ? "?" : Owner[..1].ToUpperInvariant();
     public Bitmap? Avatar => AvatarBytes is null ? null : new Bitmap(new MemoryStream(AvatarBytes));

@@ -1,8 +1,8 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-    <Version>1.1.1</Version>
-        <TargetFramework>net10.0</TargetFramework>
+    <Version>1.2.0</Version>
+        <TargetFramework>net11.0</TargetFramework>
         <Nullable>enable</Nullable>
         <ImplicitUsings>enable</ImplicitUsings>
         <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
@@ -14,26 +14,23 @@
 
     <ItemGroup>
 
-        <PackageReference Include="ShiroBot.SDK" Version="0.9.8" />
+        <PackageReference Include="Markdig" Version="1.6.0" />
+
+        <PackageReference Include="ShiroBot.SDK" Version="1.0.4" />
     </ItemGroup>
 
-    <Target Name="CopyPluginToHost"
-            AfterTargets="Build"
-            Condition="'$(Configuration)'=='Debug'">
+    <Target Name="CopyPluginToHost" AfterTargets="Build" Condition="'$(Configuration)'=='Debug'">
         <MakeDir Directories="$(HostPluginDir)" />
 
         <ItemGroup>
-            <PluginDebugOutput Include="$(TargetDir)**\*"
-                               Exclude="$(TargetDir)Avalonia*.dll;$(TargetDir)Avalonia*.pdb;$(TargetDir)HarfBuzzSharp.dll;$(TargetDir)HarfBuzzSharp.pdb;$(TargetDir)MicroCom.Runtime.dll;$(TargetDir)MicroCom.Runtime.pdb;$(TargetDir)SkiaSharp.dll;$(TargetDir)SkiaSharp.pdb;$(TargetDir)runtimes\**\*;$(TargetDir)$(AssemblyName).exe;$(TargetDir)$(AssemblyName).runtimeconfig.json;$(TargetDir)ShiroBot.AvaloniaSdk.dll;$(TargetDir)ShiroBot.AvaloniaSdk.pdb;$(TargetDir)ShiroBot.SDK.dll;$(TargetDir)ShiroBot.SDK.pdb;$(TargetDir)ShiroBot.Model.*.dll;$(TargetDir)ShiroBot.Model.*.pdb" />
+            <PluginDebugOutput Include="$(TargetDir)**\*" Exclude="$(TargetDir)Avalonia*.dll;$(TargetDir)Avalonia*.pdb;$(TargetDir)HarfBuzzSharp.dll;$(TargetDir)HarfBuzzSharp.pdb;$(TargetDir)MicroCom.Runtime.dll;$(TargetDir)MicroCom.Runtime.pdb;$(TargetDir)SkiaSharp.dll;$(TargetDir)SkiaSharp.pdb;$(TargetDir)runtimes\**\*;$(TargetDir)$(AssemblyName).exe;$(TargetDir)$(AssemblyName).runtimeconfig.json;$(TargetDir)ShiroBot.AvaloniaSdk.dll;$(TargetDir)ShiroBot.AvaloniaSdk.pdb;$(TargetDir)ShiroBot.SDK.dll;$(TargetDir)ShiroBot.SDK.pdb;$(TargetDir)ShiroBot.Model.*.dll;$(TargetDir)ShiroBot.Model.*.pdb" />
             <PluginPreviewOnlyOutput Include="$(HostPluginDir)Avalonia*.dll;$(HostPluginDir)Avalonia*.pdb;$(HostPluginDir)HarfBuzzSharp.dll;$(HostPluginDir)HarfBuzzSharp.pdb;$(HostPluginDir)MicroCom.Runtime.dll;$(HostPluginDir)MicroCom.Runtime.pdb;$(HostPluginDir)SkiaSharp.dll;$(HostPluginDir)SkiaSharp.pdb;$(HostPluginDir)$(AssemblyName).exe;$(HostPluginDir)$(AssemblyName).runtimeconfig.json;$(HostPluginDir)runtimes\**\*" />
         </ItemGroup>
 
         <Delete Files="@(PluginPreviewOnlyOutput)" />
         <RemoveDir Directories="$(HostPluginDir)runtimes" />
 
-        <Copy SourceFiles="@(PluginDebugOutput)"
-              DestinationFiles="@(PluginDebugOutput->'$(HostPluginDir)%(RecursiveDir)%(Filename)%(Extension)')"
-              SkipUnchangedFiles="true" />
+        <Copy SourceFiles="@(PluginDebugOutput)" DestinationFiles="@(PluginDebugOutput->'$(HostPluginDir)%(RecursiveDir)%(Filename)%(Extension)')" SkipUnchangedFiles="true" />
     </Target>
 
 </Project>

@@ -1,0 +1,90 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:views="clr-namespace:ShiroBot.Plugin.GithubView.Views"
+             xmlns:md="clr-namespace:ShiroBot.Plugin.GithubView.Markdown"
+             x:Class="ShiroBot.Plugin.GithubView.Views.ReadmeCard"
+             x:DataType="views:ReadmeCardViewModel"
+             Width="860">
+
+    <Design.DataContext>
+        <views:ReadmeCardViewModel/>
+    </Design.DataContext>
+
+    <UserControl.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <views:GitHubTheme/>
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </UserControl.Resources>
+
+    <Border Background="{DynamicResource Gh.Canvas}"
+            BorderBrush="{DynamicResource Gh.CardBorder}"
+            BorderThickness="1"
+            CornerRadius="12"
+            ClipToBounds="True">
+        <StackPanel>
+
+            <!-- 头部：仓库 + 文件名 + 分支。所有元素统一 28px 高、垂直居中 -->
+            <Border Background="{DynamicResource Gh.CanvasSubtle}"
+                    BorderBrush="{DynamicResource Gh.Border}"
+                    BorderThickness="0,0,0,1"
+                    Height="60"
+                    Padding="24,0">
+                <Grid ColumnDefinitions="Auto,*,Auto" VerticalAlignment="Center">
+                    <Border Grid.Column="0"
+                            Width="28" Height="28"
+                            CornerRadius="6"
+                            ClipToBounds="True"
+                            VerticalAlignment="Center">
+                        <Grid>
+                            <Image Source="{Binding Avatar}" IsVisible="{Binding HasAvatar}" Stretch="UniformToFill"/>
+                            <Border Background="{DynamicResource Gh.Placeholder}" IsVisible="{Binding HasNoAvatar}"/>
+                            <TextBlock Text="{Binding OwnerInitial}" IsVisible="{Binding HasNoAvatar}"
+                                       HorizontalAlignment="Center" VerticalAlignment="Center"
+                                       FontSize="14" FontWeight="Bold" Foreground="#FFFFFF"/>
+                        </Grid>
+                    </Border>
+                    <TextBlock Grid.Column="1"
+                               Margin="12,0,16,0"
+                               Text="{Binding RepositoryDisplay}"
+                               FontSize="17"
+                               FontWeight="SemiBold"
+                               Foreground="{DynamicResource Gh.Fg}"
+                               VerticalAlignment="Center"
+                               TextTrimming="CharacterEllipsis"/>
+                    <StackPanel Grid.Column="2" Orientation="Horizontal" Spacing="8" Height="28" VerticalAlignment="Center">
+                        <Path Data="M0 1.75A.75.75 0 0 1 .75 1h4.253c1.227 0 2.317.59 3 1.501A3.743 3.743 0 0 1 11.006 1h4.245a.75.75 0 0 1 .75.75v10.5a.75.75 0 0 1-.75.75h-4.507a2.25 2.25 0 0 0-1.591.659l-.622.621a.75.75 0 0 1-1.06 0l-.622-.621A2.25 2.25 0 0 0 5.258 13H.75a.75.75 0 0 1-.75-.75Zm7.251 10.324.004-5.073-.002-2.253A2.25 2.25 0 0 0 5.003 2.5H1.5v9h3.757a3.75 3.75 0 0 1 1.994.574ZM8.755 4.75l-.004 7.322a3.752 3.752 0 0 1 1.992-.572H14.5v-9h-3.495a2.25 2.25 0 0 0-2.25 2.25Z"
+                              Fill="{DynamicResource Gh.FgMuted}" Width="16" Height="16" Stretch="Uniform"
+                              VerticalAlignment="Center"/>
+                        <TextBlock Text="{Binding FileName}" FontSize="15" FontWeight="SemiBold"
+                                   Foreground="{DynamicResource Gh.Fg}" VerticalAlignment="Center"/>
+                        <Border Background="{DynamicResource Gh.Canvas}"
+                                BorderBrush="{DynamicResource Gh.Border}"
+                                BorderThickness="1"
+                                CornerRadius="6"
+                                Height="24"
+                                Padding="8,0"
+                                Margin="4,0,0,0"
+                                VerticalAlignment="Center">
+                            <StackPanel Orientation="Horizontal" Spacing="5" VerticalAlignment="Center">
+                                <Path Data="M9.5 3.25a2.25 2.25 0 1 1 3 2.122V6A2.5 2.5 0 0 1 10 8.5H6a1 1 0 0 0-1 1v1.128a2.251 2.251 0 1 1-1.5 0V5.372a2.25 2.25 0 1 1 1.5 0v1.836A2.493 2.493 0 0 1 6 7h4a1 1 0 0 0 1-1v-.628A2.25 2.25 0 0 1 9.5 3.25Zm-6 0a.75.75 0 1 0 1.5 0 .75.75 0 0 0-1.5 0Zm8.25-.75a.75.75 0 1 0 0 1.5.75.75 0 0 0 0-1.5ZM4.25 12a.75.75 0 1 0 0 1.5.75.75 0 0 0 0-1.5Z"
+                                      Fill="{DynamicResource Gh.FgMuted}" Width="12" Height="12" Stretch="Uniform"
+                                      VerticalAlignment="Center"/>
+                                <TextBlock Text="{Binding Branch}" FontSize="12.5"
+                                           Foreground="{DynamicResource Gh.FgMuted}"
+                                           FontFamily="Cascadia Mono, Consolas, Menlo, monospace"
+                                           VerticalAlignment="Center"
+                                           MaxWidth="160" TextTrimming="CharacterEllipsis"/>
+                            </StackPanel>
+                        </Border>
+                    </StackPanel>
+                </Grid>
+            </Border>
+
+            <md:MarkdownView Markdown="{Binding Content}" Margin="40,32,40,36"/>
+
+            <Border Height="8" Background="{DynamicResource Gh.Footer}"/>
+        </StackPanel>
+    </Border>
+</UserControl>

@@ -1,0 +1,66 @@
+<ResourceDictionary xmlns="https://github.com/avaloniaui"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    x:Class="ShiroBot.Plugin.GithubView.Views.GitHubTheme">
+
+    <!--
+        GitHub Primer 配色。宿主渲染前会设置 Application.RequestedThemeVariant，
+        卡片与 MarkdownView 通过 DynamicResource 取色，浅色 / 深色自动切换。
+    -->
+    <ResourceDictionary.ThemeDictionaries>
+
+        <ResourceDictionary x:Key="Light">
+            <SolidColorBrush x:Key="Gh.Canvas" Color="#FFFFFF"/>
+            <SolidColorBrush x:Key="Gh.CanvasSubtle" Color="#F6F8FA"/>
+            <SolidColorBrush x:Key="Gh.CardBorder" Color="#D1D9E0"/>
+            <SolidColorBrush x:Key="Gh.Border" Color="#D1D9E0"/>
+            <SolidColorBrush x:Key="Gh.Divider" Color="#D8DEE4"/>
+            <SolidColorBrush x:Key="Gh.Fg" Color="#1F2328"/>
+            <SolidColorBrush x:Key="Gh.FgMuted" Color="#59636E"/>
+            <SolidColorBrush x:Key="Gh.FgSubtle" Color="#818B98"/>
+            <SolidColorBrush x:Key="Gh.Link" Color="#0969DA"/>
+            <SolidColorBrush x:Key="Gh.AccentSubtle" Color="#DDF4FF"/>
+            <SolidColorBrush x:Key="Gh.AccentBorder" Color="#B6E3FF"/>
+            <SolidColorBrush x:Key="Gh.CodeBackground" Color="#F6F8FA"/>
+            <SolidColorBrush x:Key="Gh.InlineCodeBackground" Color="#EFF1F3"/>
+            <SolidColorBrush x:Key="Gh.Success" Color="#1A7F37"/>
+            <SolidColorBrush x:Key="Gh.Danger" Color="#D1242F"/>
+            <SolidColorBrush x:Key="Gh.CheckboxBorder" Color="#818B98"/>
+            <SolidColorBrush x:Key="Gh.Placeholder" Color="#AFB8C1"/>
+            <SolidColorBrush x:Key="Gh.Footer" Color="#1F2328"/>
+            <SolidColorBrush x:Key="Gh.HintBackground" Color="#F6F8FA"/>
+            <Color x:Key="Gh.Note">#0969DA</Color>
+            <Color x:Key="Gh.Tip">#1A7F37</Color>
+            <Color x:Key="Gh.Important">#8250DF</Color>
+            <Color x:Key="Gh.Warning">#9A6700</Color>
+            <Color x:Key="Gh.Caution">#D1242F</Color>
+        </ResourceDictionary>
+
+        <ResourceDictionary x:Key="Dark">
+            <SolidColorBrush x:Key="Gh.Canvas" Color="#0D1117"/>
+            <SolidColorBrush x:Key="Gh.CanvasSubtle" Color="#151B23"/>
+            <SolidColorBrush x:Key="Gh.CardBorder" Color="#3D444D"/>
+            <SolidColorBrush x:Key="Gh.Border" Color="#3D444D"/>
+            <SolidColorBrush x:Key="Gh.Divider" Color="#2F353D"/>
+            <SolidColorBrush x:Key="Gh.Fg" Color="#F0F6FC"/>
+            <SolidColorBrush x:Key="Gh.FgMuted" Color="#9198A1"/>
+            <SolidColorBrush x:Key="Gh.FgSubtle" Color="#656C76"/>
+            <SolidColorBrush x:Key="Gh.Link" Color="#4493F8"/>
+            <SolidColorBrush x:Key="Gh.AccentSubtle" Color="#122440"/>
+            <SolidColorBrush x:Key="Gh.AccentBorder" Color="#1F4A85"/>
+            <SolidColorBrush x:Key="Gh.CodeBackground" Color="#151B23"/>
+            <SolidColorBrush x:Key="Gh.InlineCodeBackground" Color="#262C36"/>
+            <SolidColorBrush x:Key="Gh.Success" Color="#3FB950"/>
+            <SolidColorBrush x:Key="Gh.Danger" Color="#F85149"/>
+            <SolidColorBrush x:Key="Gh.CheckboxBorder" Color="#656C76"/>
+            <SolidColorBrush x:Key="Gh.Placeholder" Color="#3D444D"/>
+            <SolidColorBrush x:Key="Gh.Footer" Color="#3D444D"/>
+            <SolidColorBrush x:Key="Gh.HintBackground" Color="#151B23"/>
+            <Color x:Key="Gh.Note">#4493F8</Color>
+            <Color x:Key="Gh.Tip">#3FB950</Color>
+            <Color x:Key="Gh.Important">#AB7DF8</Color>
+            <Color x:Key="Gh.Warning">#D29922</Color>
+            <Color x:Key="Gh.Caution">#F85149</Color>
+        </ResourceDictionary>
+
+    </ResourceDictionary.ThemeDictionaries>
+</ResourceDictionary>
