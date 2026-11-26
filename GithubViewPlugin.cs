@@ -14,7 +14,7 @@ namespace ShiroBot.Plugin.GithubView;
 
 [BotPlugin(id: "GithubView",
     Name = "Github 预览插件",
-    Version = "1.2.0",
+    Version = "1.2.1",
     Author = "greepar",
     Category = PluginCategory.Render,
     Description = "识别 GitHub 仓库、Issue 与 Pull Request 链接并渲染信息卡片，回复仓库卡片可查看完整 README。",

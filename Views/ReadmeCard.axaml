@@ -19,9 +19,7 @@
     </UserControl.Resources>
 
     <Border Background="{DynamicResource Gh.Canvas}"
-            BorderBrush="{DynamicResource Gh.CardBorder}"
-            BorderThickness="1"
-            CornerRadius="12"
+            CornerRadius="6"
             ClipToBounds="True">
         <StackPanel>
 

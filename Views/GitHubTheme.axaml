@@ -11,7 +11,6 @@
         <ResourceDictionary x:Key="Light">
             <SolidColorBrush x:Key="Gh.Canvas" Color="#FFFFFF"/>
             <SolidColorBrush x:Key="Gh.CanvasSubtle" Color="#F6F8FA"/>
-            <SolidColorBrush x:Key="Gh.CardBorder" Color="#D1D9E0"/>
             <SolidColorBrush x:Key="Gh.Border" Color="#D1D9E0"/>
             <SolidColorBrush x:Key="Gh.Divider" Color="#D8DEE4"/>
             <SolidColorBrush x:Key="Gh.Fg" Color="#1F2328"/>
@@ -38,7 +37,6 @@
         <ResourceDictionary x:Key="Dark">
             <SolidColorBrush x:Key="Gh.Canvas" Color="#0D1117"/>
             <SolidColorBrush x:Key="Gh.CanvasSubtle" Color="#151B23"/>
-            <SolidColorBrush x:Key="Gh.CardBorder" Color="#3D444D"/>
             <SolidColorBrush x:Key="Gh.Border" Color="#3D444D"/>
             <SolidColorBrush x:Key="Gh.Divider" Color="#2F353D"/>
             <SolidColorBrush x:Key="Gh.Fg" Color="#F0F6FC"/>
